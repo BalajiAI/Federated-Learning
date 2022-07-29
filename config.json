@@ -1,0 +1,32 @@
+{
+
+     "data_config":{
+                      "dataset_path": "./Data/CIFAR10",
+                      "dataset_name": "CIFAR10",
+                      "non_iid_per": 0.0
+                   },
+     
+           
+     "fed_config":{  "algorithm": "scaffold",
+                     "fraction_clients": 0.1,
+                     "num_clients": 100,
+                     "num_rounds": 30,
+                     "num_epochs": 10,
+                     "batch_size": 32,
+                     "global_stepsize": 1.0,
+                     "local_stepsize": 0.05,
+                     "criterion": "torch.nn.CrossEntropyLoss"
+                  },
+
+
+     "model_config":{
+                       "name": "CNN_Cifar"
+                    },
+  
+              
+     "global_config":{
+                        "seed": 42,
+                        "device": "cpu"
+                     }
+
+}

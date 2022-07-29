@@ -1,2 +1,2 @@
 # Federated-Learning
-Implementation of Federated Learning algorithms using Pytorch
+Implementation of Federated Learning algorithms using PyTorch
