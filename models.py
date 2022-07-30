@@ -57,5 +57,6 @@ class CNN_Mnist(nn.Module):
         x = self.feature_extractor(x)
         x = nn.Flatten()(x)
         x = self.fully_connected(x)
+        
         return x
         

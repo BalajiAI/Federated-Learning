@@ -59,8 +59,8 @@ class Server(object):
     
     def create_clients(self, local_datasets):
         clients = []
-        for k,dataset in enumerate(local_datasets):
-            client = Client(client_id=k, local_data=dataset, device=self.device, num_epochs = self.num_epochs, criterion = self.criterion, lr=self.lr_l, client_c=deepcopy(self.server_c))
+        for id_num,dataset in enumerate(local_datasets):
+            client = Client(client_id=id_num, local_data=dataset, device=self.device, num_epochs = self.num_epochs, criterion = self.criterion, lr=self.lr_l, client_c=deepcopy(self.server_c))
             clients.append(client)
         return clients
     
