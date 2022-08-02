@@ -7,10 +7,10 @@
                    },
      
            
-     "fed_config":{  "algorithm": "fedavgm",
+     "fed_config":{  "algorithm": "fedavg",
                      "fraction_clients": 0.1,
                      "num_clients": 100,
-                     "num_rounds": 30,
+                     "num_rounds": 100,
                      "num_epochs": 10,
                      "batch_size": 32,
                      "global_stepsize": 1.0,

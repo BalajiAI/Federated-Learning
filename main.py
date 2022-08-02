@@ -15,12 +15,15 @@ model_config = config["model_config"]
 filename = f"./Logs/{datetime.datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}"
 set_logger(f"{filename}_log.txt")
 
-if (fed_config["algorithm"] == "scaffold"):
-    from src.SCAFFOLD.server import Server
-    server = Server(model_config,global_config, data_config, fed_config) #Initializes the Server with hyperparameters
+if (fed_config["algorithm"] == "fedavg"):
+    from src.FedAvg.server import Server
+    server = Server(model_config,global_config, data_config, fed_config)
 elif (fed_config["algorithm"] == "fedavgm"):
     from src.FedAvgM.server import Server
     server = Server(model_config,global_config, data_config, fed_config)
+elif (fed_config["algorithm"] == "scaffold"):
+    from src.SCAFFOLD.server import Server
+    server = Server(model_config,global_config, data_config, fed_config) #Initializes the Server with hyperparameters
 else:
     raise AttributeError(f"{fed_config['algorithm']} algorithm is not found")
 

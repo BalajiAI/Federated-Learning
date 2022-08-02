@@ -1,4 +1,4 @@
 Data/
 __pycache__
-Logs/*.txt
-Logs/*.png
+*.txt
+*.png
