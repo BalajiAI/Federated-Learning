@@ -21,9 +21,18 @@ if (fed_config["algorithm"] == "fedavg"):
 elif (fed_config["algorithm"] == "fedavgm"):
     from src.FedAvgM.server import Server
     server = Server(model_config,global_config, data_config, fed_config)
+elif (fed_config["algorithm"] == "fedadam"):
+    from src.FedAdam.server import Server
+    server = Server(model_config,global_config, data_config, fed_config)
 elif (fed_config["algorithm"] == "scaffold"):
     from src.SCAFFOLD.server import Server
-    server = Server(model_config,global_config, data_config, fed_config) #Initializes the Server with hyperparameters
+    server = Server(model_config,global_config, data_config, fed_config)
+elif (fed_config["algorithm"] == "feddyn"):
+    from src.FedDyn.server import Server
+    server = Server(model_config,global_config, data_config, fed_config)
+elif (fed_config["algorithm"] == "mime"):
+    from src.Mime.server import Server
+    server = Server(model_config,global_config, data_config, fed_config)
 else:
     raise AttributeError(f"{fed_config['algorithm']} algorithm is not found")
 

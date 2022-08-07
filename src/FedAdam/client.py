@@ -61,4 +61,3 @@ class Client():
                 del_y.data += param_y.data.detach() - param_x.data.detach()   
 
         self.delta_y = delta_y
-        
