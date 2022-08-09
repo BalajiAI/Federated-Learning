@@ -3,17 +3,17 @@
      "data_config":{
                       "dataset_path": "./Data/CIFAR10",
                       "dataset_name": "CIFAR10",
-                      "non_iid_per": 0.0
+                      "non_iid_per": 0.4
                    },
      
            
-     "fed_config":{  "algorithm": "fedadam",
+     "fed_config":{  "algorithm": "mime",
                      "fraction_clients": 0.1,
                      "num_clients": 100,
                      "num_rounds": 100,
                      "num_epochs": 10,
                      "batch_size": 32,
-                     "global_stepsize": 0.01,
+                     "global_stepsize": 1.0,
                      "local_stepsize": 0.05,
                      "criterion": "torch.nn.CrossEntropyLoss"
                   },

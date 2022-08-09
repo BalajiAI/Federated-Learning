@@ -36,11 +36,11 @@ class Server():
     def __init__(self, model_config={}, global_config={}, data_config={}, fed_config={}, optim_config={}):
       
         set_seed(global_config["seed"])
-        self.device = global_config["device"]# data transformation bug 
+        self.device = global_config["device"]
 
         self.data_path = data_config["dataset_path"]
         self.dataset_name = data_config["dataset_name"]
-        self.non_iid_per = data_config["non_iid_per"]#bug
+        self.non_iid_per = data_config["non_iid_per"]
 
         self.fraction = fed_config["fraction_clients"]
         self.num_clients = fed_config["num_clients"]
@@ -48,12 +48,12 @@ class Server():
         self.num_epochs = fed_config["num_epochs"]
         self.batch_size = fed_config["batch_size"]
         self.criterion = eval(fed_config["criterion"])()
-        self.lr = fed_config["global_stepsize"]#bugs
+        self.lr = fed_config["global_stepsize"]
         self.lr_l = fed_config["local_stepsize"]
-        self.momentum = 0
+        self.beta = 0
         
         self.x = eval(model_config["name"])()   
-        self.velocity = [torch.zeros_like(param,device=self.device) for param in self.x.parameters()]
+        self.state = [torch.zeros_like(param,device=self.device) for param in self.x.parameters()]
         
         self.clients = None       
     
@@ -82,7 +82,8 @@ class Server():
     def communicate(self, client_ids):
         """Communicates global model(x) to the participating clients"""
         for idx in client_ids:
-            self.clients[idx].x = deepcopy(self.x) 
+            self.clients[idx].x = deepcopy(self.x)
+            self.clients[idx].state = deepcopy(self.state)
                
     def update_clients(self, client_ids):
         """Tells all the clients to perform client_update"""
@@ -99,11 +100,11 @@ class Server():
                 for grad, diff in zip(gradients, self.clients[idx].delta_y):
                     grad.data.add_(diff.data / int(self.fraction * self.num_clients))
             
-            for v,grad in zip(self.velocity, gradients):
-                v.data = self.momentum * v.data + grad.data
+            for s,grad in zip(self.state, gradients):
+                s.data = (1-self.beta) * grad.data + self.beta * s.data
 
-            for param, v in zip(self.x.parameters(), self.velocity):
-                param.data = param.data + self.lr * v.data    
+            for param, s in zip(self.x.parameters(), self.state):
+                param.data += self.lr * s.data    
 
     def step(self):
         """Performs single round of training"""

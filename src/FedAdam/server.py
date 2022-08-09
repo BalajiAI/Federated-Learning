@@ -56,7 +56,7 @@ class Server():
         self.v = [torch.zeros_like(param,device=self.device) for param in self.x.parameters()] #2nd moment vector 
         
         self.beta1 = 0.9
-        self.beta2 = 0.99
+        self.beta2 = 0.999
         self.epsilon = 1e-6
         self.timestep = 1
         
