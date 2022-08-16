@@ -50,7 +50,7 @@ class Server():
         self.criterion = eval(fed_config["criterion"])()
         self.lr = fed_config["global_stepsize"]#bugs
         self.lr_l = fed_config["local_stepsize"]
-        self.momentum = 0
+        self.beta = 0.9
         
         self.x = eval(model_config["name"])()   
         self.velocity = [torch.zeros_like(param,device=self.device) for param in self.x.parameters()]
@@ -97,13 +97,16 @@ class Server():
             for idx in client_ids:
                 #Updates the x using the delta_y from all the clients
                 for grad, diff in zip(gradients, self.clients[idx].delta_y):
-                    grad.data.add_(diff.data / int(self.fraction * self.num_clients))
+                    grad.data += diff.data / int(self.fraction * self.num_clients)
             
-            for v,grad in zip(self.velocity, gradients):
-                v.data = self.momentum * v.data + grad.data
+            for v, grad in zip(self.velocity, gradients):
+                v.data = self.beta * v.data + grad.data
+            
+            for grad, v in zip(gradients, self.velocity):
+                grad.data += self.beta * v.data
 
-            for param, v in zip(self.x.parameters(), self.velocity):
-                param.data = param.data + self.lr * v.data    
+            for param, grad in zip(self.x.parameters(), gradients):
+                param.data = param.data + self.lr * grad.data    
 
     def step(self):
         """Performs single round of training"""

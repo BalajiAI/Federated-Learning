@@ -1,4 +1,3 @@
-import datetime
 import json
 import logging
 import matplotlib.pyplot as plt
@@ -12,8 +11,7 @@ fed_config = config["fed_config"]
 model_config = config["model_config"]
 
 #Set Logger
-filename = f"./Logs/{datetime.datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}"
-set_logger(f"{filename}_log.txt")
+set_logger(f"./Logs/log.txt")
 
 if (fed_config["algorithm"] == "fedavg"):
     from src.FedAvg.server import Server
@@ -41,7 +39,7 @@ server.setup() #Initializes all the clients and splits the train dataset among a
 server.train() #Trains the global model for multiple rounds
 
 
-save_plt(list(range(1, server.num_rounds+1)),server.results['accuracy'],"Num_rounds","Accuracy",f"{filename}_accgraph.png")
-save_plt(list(range(1, server.num_rounds+1)),server.results['loss'],"Num_rounds","Loss",f"{filename}_lossgraph.png")
+save_plt(list(range(1, server.num_rounds+1)),server.results['accuracy'],"Communication Round","Accuracy",f"./Logs/accgraph.png")
+save_plt(list(range(1, server.num_rounds+1)),server.results['loss'],"Communication Round","Loss",f"./Logs/lossgraph.png")
 
 logging.info("\nExecution has completed")
