@@ -52,9 +52,8 @@ class Server():
         self.lr_l = fed_config["local_stepsize"]
         self.beta = 0.9
         
-        self.x = eval(model_config["name"])().to(self.device)   
+        self.x = eval(model_config["name"])()   
         self.state = [torch.zeros_like(param,device=self.device) for param in self.x.parameters()]
-        self.control_variate = [torch.zeros_like(param,device=self.device) for param in self.x.parameters()]
         
         self.clients = None       
     
@@ -85,7 +84,6 @@ class Server():
         for idx in client_ids:
             self.clients[idx].x = deepcopy(self.x)
             self.clients[idx].state = deepcopy(self.state)
-            self.clients[idx].control_variate = deepcopy(self.control_variate)
                
     def update_clients(self, client_ids):
         """Tells all the clients to perform client_update"""
@@ -94,9 +92,10 @@ class Server():
 
     def server_update(self, client_ids):
         """Updates the global model(x)"""
+        self.x.to(self.device)
         avg_grads = [torch.zeros_like(param,device=self.device) for param in self.x.parameters()]
         delta_x = [torch.zeros_like(param,device=self.device) for param in self.x.parameters()]
-
+        
         with torch.no_grad():
             for idx in client_ids:
                 #Updates the x using the delta_y from all the clients
@@ -108,13 +107,10 @@ class Server():
             
             for s,grad in zip(self.state, avg_grads):
                 s.data = (1-self.beta) * grad.data + self.beta * s.data
-            
-            self.control_variate = deepcopy(avg_grads)
-            
+
             for param, d_x in zip(self.x.parameters(), delta_x):
-                param.data = param.data + self.lr * d_x.data    
- 
-               
+                param.data = param.data + self.lr * d_x.data
+                
     def step(self):
         """Performs single round of training"""
         sampled_client_ids = self.sample_clients()

@@ -3,11 +3,11 @@
      "data_config":{
                       "dataset_path": "./Data/CIFAR10",
                       "dataset_name": "CIFAR10",
-                      "non_iid_per": 0.8
+                      "non_iid_per": 0
                    },
      
            
-     "fed_config":{  "algorithm": "fedavgm",
+     "fed_config":{  "algorithm": "mime",
                      "fraction_clients": 0.1,
                      "num_clients": 100,
                      "num_rounds": 100,

@@ -90,7 +90,7 @@ class Server():
     def server_update(self, client_ids):
         """Updates the global model(x)"""
         self.x.to(self.device)
-        delta_x = [torch.zeros_like(param,device=self.device) for param in self.x.parameters()] #gradients or delta_x
+        delta_x = [torch.zeros_like(param,device=self.device) for param in self.x.parameters()]
         with torch.no_grad():
             for idx in client_ids:
                 #Updates the x using the delta_y from all the clients
