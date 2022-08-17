@@ -31,6 +31,9 @@ elif (fed_config["algorithm"] == "feddyn"):
 elif (fed_config["algorithm"] == "mime"):
     from src.Mime.server import Server
     server = Server(model_config,global_config, data_config, fed_config)
+elif (fed_config["algorithm"] == "mimelite"):
+    from src.MimeLite.server import Server
+    server = Server(model_config,global_config, data_config, fed_config)
 else:
     raise AttributeError(f"{fed_config['algorithm']} algorithm is not found")
 
