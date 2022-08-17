@@ -7,7 +7,7 @@
                    },
      
            
-     "fed_config":{  "algorithm": "mimelite",
+     "fed_config":{  "algorithm": "feddyn",
                      "fraction_clients": 0.1,
                      "num_clients": 100,
                      "num_rounds": 100,
