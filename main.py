@@ -22,6 +22,9 @@ elif (fed_config["algorithm"] == "fedavgm"):
 elif (fed_config["algorithm"] == "fedadam"):
     from src.FedAdam.server import Server
     server = Server(model_config,global_config, data_config, fed_config)
+elif (fed_config["algorithm"] == "fedyogi"):
+    from src.FedYogi.server import Server
+    server = Server(model_config,global_config, data_config, fed_config)
 elif (fed_config["algorithm"] == "scaffold"):
     from src.SCAFFOLD.server import Server
     server = Server(model_config,global_config, data_config, fed_config)
