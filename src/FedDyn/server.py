@@ -91,23 +91,23 @@ class Server():
     def server_update(self, client_ids):
         """Updates the global model(x)"""
         self.x.to(self.device)
-        avg_y = [torch.zeros_like(param,device=self.device) for param in self.x.parameters()]
+        sum_y = [torch.zeros_like(param,device=self.device) for param in self.x.parameters()]
         with torch.no_grad():
             for idx in client_ids:
-                for a_y, y in zip(avg_y, self.clients[idx].y.parameters()):
-                    a_y.data += y.data
+                for s_y, y in zip(sum_y, self.clients[idx].y.parameters()):
+                    s_y.data += y.data
 
             delta_x = [torch.zeros_like(param) for param in self.x.parameters()]
-            for d_x, a_y, x in zip(delta_x, avg_y, self.x.parameters()):
-                d_x.data = a_y.data - x.data
+            for d_x, s_y, x in zip(delta_x, sum_y, self.x.parameters()):
+                d_x.data = s_y.data - x.data
             
             #Update h
             for h, d_x in zip(self.h, delta_x):
                 h.data -= (self.alpha/self.num_clients) * d_x.data
 
             #Update x
-            for x, a_y, h in zip(self.x.parameters(), avg_y, self.h):
-                x.data = (a_y.data/(self.fraction * self.num_clients)) - (h.data/self.alpha)         
+            for x, s_y, h in zip(self.x.parameters(), sum_y, self.h):
+                x.data = (s_y.data/(self.fraction * self.num_clients)) - (h.data/self.alpha)         
 
     def step(self):
         """Performs single round of training"""
