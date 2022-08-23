@@ -5,9 +5,9 @@ from torch.utils.data import DataLoader
 from copy import deepcopy
 
 from .client import Client
-from models import *
-from load_data_for_clients import dist_data_per_client
-from util_functions import set_seed, evaluate_fn
+from src.models import *
+from src.load_data_for_clients import dist_data_per_client
+from src.util_functions import set_seed, evaluate_fn
 
 class Server():
     """

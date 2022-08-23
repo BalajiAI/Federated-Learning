@@ -1,7 +1,7 @@
 import json
 import logging
 import matplotlib.pyplot as plt
-from util_functions import set_logger, save_plt
+from src.util_functions import set_logger, save_plt
 
 with open('config.json','r') as file:
     config = json.load(file) #Converts json file format into python dictionary
@@ -14,7 +14,7 @@ model_config = config["model_config"]
 filename = f"./Logs/{fed_config['algorithm']}-{data_config['non_iid_per']}"
 set_logger(f"{filename}_log.txt")
 
-exec(f"from src.{fed_config['algorithm']}.server import Server")
+exec(f"from src.algorithms.{fed_config['algorithm']}.server import Server")
 server = Server(model_config,global_config, data_config, fed_config)
 
 logging.info("Server is successfully initialized")

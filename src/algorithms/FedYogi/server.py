@@ -5,9 +5,9 @@ from torch.utils.data import DataLoader
 from copy import deepcopy
 
 from .client import Client
-from models import *
-from load_data_for_clients import dist_data_per_client
-from util_functions import set_seed, evaluate_fn
+from src.models import *
+from src.load_data_for_clients import dist_data_per_client
+from src.util_functions import set_seed, evaluate_fn
 
 class Server():
     """
@@ -50,10 +50,15 @@ class Server():
         self.criterion = eval(fed_config["criterion"])()
         self.lr = fed_config["global_stepsize"]#bugs
         self.lr_l = fed_config["local_stepsize"]
-        self.beta = 0.9
         
         self.x = eval(model_config["name"])()   
-        self.velocity = [torch.zeros_like(param,device=self.device) for param in self.x.parameters()]
+        self.m = [torch.zeros_like(param,device=self.device) for param in self.x.parameters()] #1st moment vector
+        self.v = [torch.zeros_like(param,device=self.device) for param in self.x.parameters()] #2nd moment vector 
+        
+        self.beta1 = 0.9
+        self.beta2 = 0.999
+        self.epsilon = 1e-6
+        self.timestep = 1
         
         self.clients = None       
     
@@ -97,16 +102,16 @@ class Server():
             for idx in client_ids:
                 #Updates the x using the delta_y from all the clients
                 for grad, diff in zip(gradients, self.clients[idx].delta_y):
-                    grad.data += diff.data / int(self.fraction * self.num_clients)
-            
-            for v, grad in zip(self.velocity, gradients):
-                v.data = self.beta * v.data + grad.data
-            
-            for grad, v in zip(gradients, self.velocity):
-                grad.data += self.beta * v.data
-
-            for param, grad in zip(self.x.parameters(), gradients):
-                param.data = param.data + self.lr * grad.data    
+                    grad.data.add_(diff.data / int(self.fraction * self.num_clients))  
+                    
+            for p,g,m,v in zip(self.x.parameters(), gradients, self.m, self.v):
+                m.data = self.beta1 * m.data + (1 - self.beta1) * g.data
+                v.data = v.data + (1 - self.beta2) * torch.sign( torch.square(g.data) - v.data) * torch.square(g.data)
+                m_bias_corr = m / (1 - self.beta1**self.timestep)
+                v_bias_corr = v / (1 - self.beta2**self.timestep)
+                p.data += self.lr * m_bias_corr / (torch.sqrt(v_bias_corr) + self.epsilon)         
+        
+        self.timestep += 1
 
     def step(self):
         """Performs single round of training"""

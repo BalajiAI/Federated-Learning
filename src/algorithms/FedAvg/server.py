@@ -5,9 +5,9 @@ from torch.utils.data import DataLoader
 from copy import deepcopy
 
 from .client import Client
-from models import *
-from load_data_for_clients import dist_data_per_client
-from util_functions import set_seed, evaluate_fn
+from src.models import *
+from src.load_data_for_clients import dist_data_per_client
+from src.util_functions import set_seed, evaluate_fn
 
 class Server():
     """
@@ -52,14 +52,7 @@ class Server():
         self.lr_l = fed_config["local_stepsize"]
         
         self.x = eval(model_config["name"])()   
-        self.m = [torch.zeros_like(param,device=self.device) for param in self.x.parameters()] #1st moment vector
-        self.v = [torch.zeros_like(param,device=self.device) for param in self.x.parameters()] #2nd moment vector 
-        
-        self.beta1 = 0.9
-        self.beta2 = 0.999
-        self.epsilon = 1e-6
-        self.timestep = 1
-        
+
         self.clients = None       
     
     def create_clients(self, local_datasets):
@@ -97,21 +90,15 @@ class Server():
     def server_update(self, client_ids):
         """Updates the global model(x)"""
         self.x.to(self.device)
-        gradients = [torch.zeros_like(param,device=self.device) for param in self.x.parameters()] #gradients or delta_x
+        delta_x = [torch.zeros_like(param,device=self.device) for param in self.x.parameters()]
         with torch.no_grad():
             for idx in client_ids:
                 #Updates the x using the delta_y from all the clients
-                for grad, diff in zip(gradients, self.clients[idx].delta_y):
-                    grad.data.add_(diff.data / int(self.fraction * self.num_clients))  
-                    
-            for p,g,m,v in zip(self.x.parameters(), gradients, self.m, self.v):
-                m.data = self.beta1 * m.data + (1 - self.beta1) * g.data
-                v.data = v.data + (1 - self.beta2) * torch.sign( torch.square(g.data) - v.data) * torch.square(g.data)
-                m_bias_corr = m / (1 - self.beta1**self.timestep)
-                v_bias_corr = v / (1 - self.beta2**self.timestep)
-                p.data += self.lr * m_bias_corr / (torch.sqrt(v_bias_corr) + self.epsilon)         
-        
-        self.timestep += 1
+                for d_x, diff in zip(delta_x, self.clients[idx].delta_y):
+                    d_x.data.add_(diff.data / int(self.fraction * self.num_clients))
+
+            for param, d_x in zip(self.x.parameters(), delta_x):
+                param.data = param.data + self.lr * d_x.data    
 
     def step(self):
         """Performs single round of training"""

@@ -5,9 +5,9 @@ from torch.utils.data import DataLoader
 from copy import deepcopy
 
 from .client import Client
-from models import *
-from load_data_for_clients import dist_data_per_client
-from util_functions import set_seed, evaluate_fn
+from src.models import *
+from src.load_data_for_clients import dist_data_per_client
+from src.util_functions import set_seed, evaluate_fn
 
 class Server():
     """
@@ -36,11 +36,11 @@ class Server():
     def __init__(self, model_config={}, global_config={}, data_config={}, fed_config={}, optim_config={}):
       
         set_seed(global_config["seed"])
-        self.device = global_config["device"]
+        self.device = global_config["device"]# data transformation bug 
 
         self.data_path = data_config["dataset_path"]
         self.dataset_name = data_config["dataset_name"]
-        self.non_iid_per = data_config["non_iid_per"]
+        self.non_iid_per = data_config["non_iid_per"]#bug
 
         self.fraction = fed_config["fraction_clients"]
         self.num_clients = fed_config["num_clients"]
@@ -48,12 +48,12 @@ class Server():
         self.num_epochs = fed_config["num_epochs"]
         self.batch_size = fed_config["batch_size"]
         self.criterion = eval(fed_config["criterion"])()
-        self.lr = fed_config["global_stepsize"]
+        self.lr = fed_config["global_stepsize"]#bugs
         self.lr_l = fed_config["local_stepsize"]
         self.beta = 0.9
         
         self.x = eval(model_config["name"])()   
-        self.state = [torch.zeros_like(param,device=self.device) for param in self.x.parameters()]
+        self.velocity = [torch.zeros_like(param,device=self.device) for param in self.x.parameters()]
         
         self.clients = None       
     
@@ -82,8 +82,7 @@ class Server():
     def communicate(self, client_ids):
         """Communicates global model(x) to the participating clients"""
         for idx in client_ids:
-            self.clients[idx].x = deepcopy(self.x)
-            self.clients[idx].state = deepcopy(self.state)
+            self.clients[idx].x = deepcopy(self.x) 
                
     def update_clients(self, client_ids):
         """Tells all the clients to perform client_update"""
@@ -93,24 +92,22 @@ class Server():
     def server_update(self, client_ids):
         """Updates the global model(x)"""
         self.x.to(self.device)
-        avg_grads = [torch.zeros_like(param,device=self.device) for param in self.x.parameters()]
-        delta_x = [torch.zeros_like(param,device=self.device) for param in self.x.parameters()]
-        
+        gradients = [torch.zeros_like(param,device=self.device) for param in self.x.parameters()] #gradients or delta_x
         with torch.no_grad():
             for idx in client_ids:
                 #Updates the x using the delta_y from all the clients
-                for avg_grad, grad in zip(avg_grads, self.clients[idx].gradient_x):
-                    avg_grad.data.add_(grad.data / int(self.fraction * self.num_clients))
-                    
-                for d_x, diff in zip(delta_x, self.clients[idx].delta_y):
-                    d_x.data.add_(diff.data / int(self.fraction * self.num_clients))
+                for grad, diff in zip(gradients, self.clients[idx].delta_y):
+                    grad.data += diff.data / int(self.fraction * self.num_clients)
             
-            for s,grad in zip(self.state, avg_grads):
-                s.data = (1-self.beta) * grad.data + self.beta * s.data
+            for v, grad in zip(self.velocity, gradients):
+                v.data = self.beta * v.data + grad.data
+            
+            for grad, v in zip(gradients, self.velocity):
+                grad.data += self.beta * v.data
 
-            for param, d_x in zip(self.x.parameters(), delta_x):
-                param.data = param.data + self.lr * d_x.data
-                
+            for param, grad in zip(self.x.parameters(), gradients):
+                param.data = param.data + self.lr * grad.data    
+
     def step(self):
         """Performs single round of training"""
         sampled_client_ids = self.sample_clients()

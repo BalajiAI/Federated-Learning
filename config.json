@@ -7,7 +7,7 @@
                    },
      
            
-     "fed_config":{  "algorithm": "FedYogi",
+     "fed_config":{  "algorithm": "SCAFFOLD",
                      "fraction_clients": 0.1,
                      "num_clients": 100,
                      "num_rounds": 5,

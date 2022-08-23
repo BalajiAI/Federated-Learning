@@ -4,7 +4,7 @@ from collections import Counter
 import numpy as np
 import torch
 from torch.utils.data import Dataset, DataLoader
-from util_functions import set_seed, create_data, numpy_to_tensor, load_data
+from src.util_functions import set_seed, create_data, numpy_to_tensor, load_data
 
 
 #bug
