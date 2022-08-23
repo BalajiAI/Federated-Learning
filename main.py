@@ -11,41 +11,16 @@ fed_config = config["fed_config"]
 model_config = config["model_config"]
 
 #Set Logger
-set_logger(f"./Logs/log.txt")
+filename = f"./Logs/{fed_config['algorithm']}-{data_config['non_iid_per']}"
+set_logger(f"{filename}_log.txt")
 
-if (fed_config["algorithm"] == "fedavg"):
-    from src.FedAvg.server import Server
-    server = Server(model_config,global_config, data_config, fed_config)
-elif (fed_config["algorithm"] == "fedavgm"):
-    from src.FedAvgM.server import Server
-    server = Server(model_config,global_config, data_config, fed_config)
-elif (fed_config["algorithm"] == "fedadam"):
-    from src.FedAdam.server import Server
-    server = Server(model_config,global_config, data_config, fed_config)
-elif (fed_config["algorithm"] == "fedyogi"):
-    from src.FedYogi.server import Server
-    server = Server(model_config,global_config, data_config, fed_config)
-elif (fed_config["algorithm"] == "scaffold"):
-    from src.SCAFFOLD.server import Server
-    server = Server(model_config,global_config, data_config, fed_config)
-elif (fed_config["algorithm"] == "feddyn"):
-    from src.FedDyn.server import Server
-    server = Server(model_config,global_config, data_config, fed_config)
-elif (fed_config["algorithm"] == "mime"):
-    from src.Mime.server import Server
-    server = Server(model_config,global_config, data_config, fed_config)
-elif (fed_config["algorithm"] == "mimelite"):
-    from src.MimeLite.server import Server
-    server = Server(model_config,global_config, data_config, fed_config)
-else:
-    raise AttributeError(f"{fed_config['algorithm']} algorithm is not found")
+exec(f"from src.{fed_config['algorithm']}.server import Server")
+server = Server(model_config,global_config, data_config, fed_config)
 
 logging.info("Server is successfully initialized")
 server.setup() #Initializes all the clients and splits the train dataset among all the clients
 server.train() #Trains the global model for multiple rounds
 
-
-save_plt(list(range(1, server.num_rounds+1)),server.results['accuracy'],"Communication Round","Accuracy",f"./Logs/accgraph.png")
-save_plt(list(range(1, server.num_rounds+1)),server.results['loss'],"Communication Round","Loss",f"./Logs/lossgraph.png")
-
+save_plt(list(range(1, server.num_rounds+1)),server.results['accuracy'],"Communication Round","Test Accuracy",f"{filename}_accgraph.png")
+save_plt(list(range(1, server.num_rounds+1)),server.results['loss'],"Communication Round","Test Loss",f"{filename}_lossgraph.png")
 logging.info("\nExecution has completed")
