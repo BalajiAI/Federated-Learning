@@ -33,4 +33,4 @@ if __name__ == "__main__":
     model_config = config["model_config"]
     exec(f"from src.algorithms.{fed_config['algorithm']}.server import Server")
     run_fl(Server, global_config, data_config, fed_config, model_config)
-    
+

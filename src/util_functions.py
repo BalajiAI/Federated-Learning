@@ -21,18 +21,18 @@ def set_logger(log_path):
         log_path: (string) where to log
     """
     logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
+    logger.handlers.clear()
 
-    if not logger.handlers:
-        # Logging to a file
-        file_handler = logging.FileHandler(log_path)
-        file_handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s: %(message)s'))
-        logger.addHandler(file_handler)
+    logger.setLevel(logging.INFO)    
+    # Logging to a file
+    file_handler = logging.FileHandler(log_path)
+    file_handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s: %(message)s'))
+    logger.addHandler(file_handler)
 
-        # Logging to console
-        stream_handler = logging.StreamHandler()
-        stream_handler.setFormatter(logging.Formatter('%(message)s'))
-        logger.addHandler(stream_handler)
+    # Logging to console
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(logging.Formatter('%(message)s'))
+    logger.addHandler(stream_handler)
       
 def save_plt(x,y,xlabel,ylabel,filename):
     plt.plot(x,y)
