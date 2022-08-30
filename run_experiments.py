@@ -9,7 +9,7 @@ fed_config = config["fed_config"]
 model_config = config["model_config"]
 
 algorithms = ["FedAdagrad"]
-non_iid = [0] #[0, 0.2, 0.4, 0.55, 0.6, 0.75, 0.8, 0.9]
+non_iid = [0.2, 0.4, 0.55] #[0, 0.2, 0.4, 0.55, 0.6, 0.75, 0.8, 0.9]
 
 for algo in algorithms:
     fed_config["algorithm"] = algo
