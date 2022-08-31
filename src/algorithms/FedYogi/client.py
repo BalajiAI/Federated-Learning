@@ -12,9 +12,9 @@ class Client():
         id: Acts as an identifier for a particular client
         data: Local dataset which resides on the client
         device: Specifies which device (cpu or gpu) to use for training
-        num_epochs:
-        lr:
-        criterion:
+        num_epochs: Number of epochs to train the local model
+        lr: Local stepsize
+        criterion: Measures the disagreement between model's prediction and ground truth
         x: Global model sent by server
         y: Local model initialized using x
         delta_y: Used to update the x    
