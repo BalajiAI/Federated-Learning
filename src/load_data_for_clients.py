@@ -7,8 +7,6 @@ from torch.utils.data import Dataset, DataLoader
 from src.util_functions import set_seed, create_data, numpy_to_tensor, load_data
 
 
-#bug
-
 # Return num_clients+1 data. The +1 is for the server test set to evaluate performance
 # non_iid_per - Define the amount of non-iid-ness required (range is between 0 and 1)
 def dist_data_per_client(data_path,dataset_name,num_clients, batch_size, non_iid_per, device):
