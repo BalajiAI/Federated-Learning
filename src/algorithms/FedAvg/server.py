@@ -36,11 +36,11 @@ class Server():
     def __init__(self, model_config={}, global_config={}, data_config={}, fed_config={}, optim_config={}):
       
         set_seed(global_config["seed"])
-        self.device = global_config["device"]# data transformation bug 
+        self.device = global_config["device"]
 
         self.data_path = data_config["dataset_path"]
         self.dataset_name = data_config["dataset_name"]
-        self.non_iid_per = data_config["non_iid_per"]#bug
+        self.non_iid_per = data_config["non_iid_per"]
 
         self.fraction = fed_config["fraction_clients"]
         self.num_clients = fed_config["num_clients"]
@@ -48,7 +48,7 @@ class Server():
         self.num_epochs = fed_config["num_epochs"]
         self.batch_size = fed_config["batch_size"]
         self.criterion = eval(fed_config["criterion"])()
-        self.lr = fed_config["global_stepsize"]#bugs
+        self.lr = fed_config["global_stepsize"]
         self.lr_l = fed_config["local_stepsize"]
         
         self.x = eval(model_config["name"])()   
