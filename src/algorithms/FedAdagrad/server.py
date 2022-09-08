@@ -117,7 +117,7 @@ class Server():
         """Performs multiple rounds of training using the 'step' method."""
         self.results = {"loss": [], "accuracy": []}
         for round in range(self.num_rounds):
-            logging.info(f"\nTraining Round:{round+1}")
+            logging.info(f"\nCommunication Round:{round+1}")
             self.step()
             test_loss, test_acc = evaluate_fn(self.data,self.x,self.criterion,self.device) #Evaluates the global model's performance on the test dataset
             self.results['loss'].append(test_loss)
