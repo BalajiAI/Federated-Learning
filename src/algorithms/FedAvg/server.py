@@ -90,15 +90,16 @@ class Server():
     def server_update(self, client_ids):
         """Updates the global model(x)"""
         self.x.to(self.device)
-        delta_x = [torch.zeros_like(param,device=self.device) for param in self.x.parameters()]
+        avg_y = [torch.zeros_like(param,device=self.device) for param in self.x.parameters()]
+        
         with torch.no_grad():
             for idx in client_ids:
                 #Updates the x using the delta_y from all the clients
-                for d_x, diff in zip(delta_x, self.clients[idx].delta_y):
-                    d_x.data.add_(diff.data / int(self.fraction * self.num_clients))
+                 for a_y, y in zip(avg_y, self.clients[idx].y.parameters()):
+                    a_y.data.add_(y.data / int(self.fraction * self.num_clients))
 
-            for param, d_x in zip(self.x.parameters(), delta_x):
-                param.data = param.data + self.lr * d_x.data    
+            for param, a_y in zip(self.x.parameters(), avg_y):
+                param.data = a_y.data 
 
     def step(self):
         """Performs single round of training"""

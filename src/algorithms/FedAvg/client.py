@@ -28,8 +28,6 @@ class Client():
         self.criterion = criterion
         self.x = None
         self.y = None
-        #delta_y of a client are communicated to the central server after client_update has completed
-        self.delta_y = None
 
     def client_update(self):
         """
@@ -53,12 +51,3 @@ class Client():
                     param.data = param.data - self.lr * grad.data
 
             #if self.device == "cuda": torch.cuda.empty_cache()               
-       
-        with torch.no_grad():
-            delta_y = [torch.zeros_like(param) for param in self.y.parameters()]
-            #Calculate delta_y which equals to y-x [Algorithm line no:13]
-            for del_y, param_y, param_x in zip(delta_y, self.y.parameters(), self.x.parameters()):
-                del_y.data += param_y.data.detach() - param_x.data.detach()   
-
-        self.delta_y = delta_y
-        
