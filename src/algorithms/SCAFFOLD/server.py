@@ -100,7 +100,7 @@ class Server(object):
                     param.data.add_(diff.data * self.lr / int(self.fraction * self.num_clients))
                 #Updates the server_c using the delta_c from all the clients 
                 for c_g, c_d in zip(self.server_c, self.clients[idx].delta_c):
-                    c_g.data.add_(c_d.data / self.num_clients)
+                    c_g.data.add_(c_d.data * self.fraction)
 
     def step(self):
         """Performs single round of training"""
