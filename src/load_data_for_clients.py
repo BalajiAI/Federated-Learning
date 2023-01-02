@@ -147,19 +147,3 @@ def dist_data_per_client(data_path,dataset_name,num_clients, batch_size, non_iid
     test_loader = DataLoader(dataset=test_data, batch_size=batch_size, shuffle=True, num_workers=0)
 
     return client_loaders, test_loader
-
-#Testing purposes
-
-#client_loaders, test_loader = dist_data_per_client("Data/CIFAR10","CIFAR10",200, 32, 0.65, "cpu")
-
-'''
-
-print(len(client_loaders))
-print(client_loaders[0])
-for i in client_loaders:
-    print(len(i))
-    x,y = next(iter(i))
-    print(x.shape[0])
- 
-'''
-
