@@ -3,6 +3,3 @@ This repository contains the code for Federated Learning algorithms such as [**F
 
 ## Execution
 You can run this code by executing `python main.py` command in your terminal. You can modify the **_config.json_** file to match the set of hyperarameters that you wish to use for execution.
-
-## Running Experiments
-If you wish to run multiple experiments on the algorithms by changing various hyperparameters, then use `python run_experiments.py` command. You can also modify the **_run_experiments.py_** file, to specify which algorithm to run and what set of hyperparameters to use for the experiments.
